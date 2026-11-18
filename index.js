@@ -31,13 +31,45 @@ list.addEventListener('click', event  => {
     if(event.target.classList.contains('toggle')){
         const task = tasks.find(task => task.id === id)
         task.done = !task.done
+        render()
     }
 
     if(event.target.classList.contains('delete')){
         tasks = tasks.filter(task => task.id !== id)
+        render()
     }
 
-    render()
+    
+})
+
+list.addEventListener('dblclick', event => {
+    const span = event.target.closest('span')
+    if (!span) return;
+
+    const li = span.closest('li')
+    const id = Number(li.dataset.id)
+    const task = tasks.find(task => task.id === id)
+
+    const editInput = document.createElement('input')
+    editInput.type = 'text'
+    editInput.value = task.title
+
+    li.replaceChild(editInput, span)
+    editInput.focus()
+
+    editInput.addEventListener('blur', () => {
+        const title = editInput.value.trim()
+        if (title) task.title = title
+        render()
+    }, {once: true})
+
+    editInput.addEventListener('keydown', event => {
+        if (event.key === 'Enter') editInput.blur()
+        if (event.key === 'Escape') {
+            editInput.value = task.title
+            editInput.blur()
+        }
+    })
 })
 
 function render(){
